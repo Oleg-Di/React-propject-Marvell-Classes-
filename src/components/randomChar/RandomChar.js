@@ -1,49 +1,45 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
-import MarvelService from './../../services/MarvelService';
+import useMarvelService from './../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 
-class RandomChar extends Component{
+const RandomChar = ()=>{
 
-   componentDidMount(){
-    this.updateChar();
-   }
-   state = {
-     char:{},
-     loading: true,
-     error: false
-   }
+    const [state, setState] = useState({
+        char:{},
    
-   marvelService = new MarvelService();
-   onLoading = () => {
-       this.setState({...this.state, loading: true})
-   }
-   onCharLoaded = (char) => {
-       this.setState({char, loading: false, error: false})
-   }
+    })
 
-   onError = () => {
-        this.setState({
-            loading: false,
-            error: true
-        })
-   }
+    useEffect(()=> {
+        updateChar()
+        const timerId = setInterval(updateChar, 6000);
 
+        return () => {
+            clearInterval(timerId)
+        }
+       
+    },[])
+   
+ 
+   
+   const {loading, error, getCharacter, clearError} =  useMarvelService();
   
+   const onCharLoaded = (char) => {
+       setState({char})
+   }
 
-   updateChar = () => {
-        this.onLoading()
-       const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000)
-       this.marvelService
-       .getCharacter(id)
-       .then(this.onCharLoaded)
-       .catch(this.onError)
+
+   const updateChar = () => {
+       clearError()
+       const id = Math.floor(Math.random() * (1011400 - 1011000)) + 1011000;
+       getCharacter(id)
+       .then(onCharLoaded)
    }
    
-   render(){
-       const {char, loading, error} = this.state;
+  
+       const {char} = state;
     return (
         <div className="randomchar">
             {loading ? <Spinner/>: error? <ErrorMessage/> : <View char={char}/>}
@@ -55,7 +51,7 @@ class RandomChar extends Component{
                 <p className="randomchar__title">
                     Or choose another one
                 </p>
-                <button onClick = {this.updateChar} className="button button__main">
+                <button onClick = {updateChar} className="button button__main">
                     <div className="inner">try it</div>
                 </button>
                 <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
@@ -67,7 +63,7 @@ class RandomChar extends Component{
    }
    
  
-}
+
 const View = ({char}) => {
 
     const {name, description, thumbnail, wiki, homepage} = char

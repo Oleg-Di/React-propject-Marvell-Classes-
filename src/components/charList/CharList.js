@@ -1,59 +1,42 @@
 import { useState, useEffect, useRef } from "react";
 import "./charList.scss";
-import MarvelService from "./../../services/MarvelService";
+import useMarvelService from "./../../services/MarvelService";
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
-const CharList =(props) => {
-  
+const CharList = (props) => {
   const [charList, setCharList] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false)
-  const [newItemLoading, setNewItemLoading] = useState(false)
-  const [offset, setOffset] = useState(210)
-  const [charEnded, setCharEnded] = useState(false)
-  
- const marvelService = new MarvelService();
+  const [newItemLoading, setNewItemLoading] = useState(false);
+  const [offset, setOffset] = useState(210);
+  const [charEnded, setCharEnded] = useState(false);
+
+  const { error, loading, getAllCharacters } = useMarvelService();
 
   useEffect(() => {
-    onRequest()
-  }, [])
+    onRequest(offset, true);
+  }, []);
 
-  const onError = () => {
-    setError(true)
-    setLoading(false)
-  };
-
- const onCharListLoaded = (newCharList) => {
+  const onCharListLoaded = (newCharList) => {
     let ended = false;
     if (newCharList.length < 9) {
       ended = true;
     }
 
-    setCharList(charList => [...charList, ...newCharList]);
-    setLoading(loading =>  false)
-    setNewItemLoading(false)
-    setOffset(offset => offset + 9)
-    setCharEnded(ended)
+    setCharList((charList) => [...charList, ...newCharList]);
+    setNewItemLoading(false);
+    setOffset((offset) => offset + 9);
+    setCharEnded(ended);
   };
 
- const onCharListLoading = () => {
-    
-      setNewItemLoading(true)
-    
+
+  const onRequest = (offset, initial) => {
+    initial ? setNewItemLoading(false) :
+    setNewItemLoading(true);
+    getAllCharacters(offset).then(onCharListLoaded);
   };
 
- const onRequest = (offset) => {
-    onCharListLoading();
-    marvelService
-      .getAllCharacters(offset)
-      .then(onCharListLoaded)
-      .catch(onError);
-  };
+  const itemRefs = useRef([]);
 
-  const itemRefs = useRef([])
- 
   const focusOnItem = (id) => {
-   
     itemRefs.current.forEach((item) => {
       item.classList.remove("char__item_selected");
       itemRefs.current[id].classList.add("char__item_selected");
@@ -61,37 +44,35 @@ const CharList =(props) => {
     });
   };
 
- 
-    
-    return (
-      <div className="char__list">
-        <ul className="char__grid">
-          {loading ? (
-            <Spinner />
-          ) : error ? (
-            <ErrorMessage />
-          ) : (
-            <ListView
-              onCharSelected={props.onCharSelected}
-              chars={charList}
-              itemRefs={itemRefs}
-              focusOnItem={focusOnItem}
-            />
-          )}
-        </ul>
-        <button
-          className="button button__main button__long"
-          disabled={newItemLoading}
-          style={{
-            display: charEnded ? "none" : "block",
-          }}
-          onClick={() => onRequest(offset)}
-        >
-          <div className="inner">load more</div>
-        </button>
-      </div>
-    );
-  }
+  return (
+    <div className="char__list">
+      <ul className="char__grid">
+        {loading && !newItemLoading ? (
+          <Spinner />
+        ) : error ? (
+          <ErrorMessage />
+        ) : (
+          <ListView
+            onCharSelected={props.onCharSelected}
+            chars={charList}
+            itemRefs={itemRefs}
+            focusOnItem={focusOnItem}
+          />
+        )}
+      </ul>
+      <button
+        className="button button__main button__long"
+        disabled={newItemLoading}
+        style={{
+          display: charEnded ? "none" : "block",
+        }}
+        onClick={() => onRequest(offset)}
+      >
+        <div className="inner">load more</div>
+      </button>
+    </div>
+  );
+};
 
 const ListView = (props) => {
   const list = props.chars.map((char, i) => {
@@ -105,7 +86,7 @@ const ListView = (props) => {
     }
     return (
       <li
-        ref={el => props.itemRefs.current[i]=el}
+        ref={(el) => (props.itemRefs.current[i] = el)}
         tabIndex={0}
         onClick={() => {
           props.onCharSelected(char.id);
