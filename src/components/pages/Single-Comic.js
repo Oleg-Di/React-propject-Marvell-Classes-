@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 
 import './singleComic.scss'
 import { Link } from 'react-router-dom';
+import { useRef } from 'react/cjs/react.development';
 
 
 
@@ -14,11 +15,15 @@ import { Link } from 'react-router-dom';
 const SingleComics = () => {
 const {comicId}= useParams();
 const [comic, setComic] = useState(null);
-
+const isMounted = useRef(true)
 const { loading, error, getComics, clearError} = useMarvelService();
 
 useEffect(() => {
+  if(isMounted) {
     ChooseComic();
+  }
+  return () => isMounted.current = false
+    
   }, [comicId]);
 
   const ChooseComic = () => {
@@ -28,7 +33,6 @@ useEffect(() => {
   };
   const onComicsLoading = (comics) => {
     setComic(comics);
-    console.log(comics);
   };
 //   const skeleton = comic || loading || error ? null : <Skeleton />;
   const errorMessage = error ? <ErrorMessage /> : null;

@@ -90,7 +90,7 @@ const View = ({ char, comic }) => {
       <ul className="char__comics-list">
         {comic.length > 0 ? null : "There is no comics with this character..."}
         {comic.map((item, i) => (
-          <li key={i} className="char__comics-item">
+          <li  key={i} className="char__comics-item">
             <Link to={`comics/${item.id}`}>
             {item.title}
             </Link>

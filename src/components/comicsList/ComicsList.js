@@ -26,7 +26,6 @@ const ComicsList = (props) => {
     if (newComicsList.length < 8) {
       ended = true;
     }
-    console.log(state.offset);
     setState({
       ...state,
       comicsList: [...state.comicsList, ...newComicsList],
@@ -36,7 +35,7 @@ const ComicsList = (props) => {
     });
   };
 
-  const onRequest = (offset, initial) => {
+  const onRequest = (offset = state.offset, initial) => {
     initial
       ? setState({ ...state, newItemLoading: false })
       : setState({ ...state, newItemLoading: true });
