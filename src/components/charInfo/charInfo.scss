@@ -1,5 +1,5 @@
 @import '../../style/variables.scss';
-
+.faded{animation-name: faded;animation-duration: 2s;}@keyframes faded{from{opacity: 0.1;}to{opacity: 1;}}
 .char {
     &__info {
         padding: 25px;

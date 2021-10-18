@@ -71,7 +71,7 @@ const View = ({ char, comic }) => {
   }
   return (
     <>
-      <div className="char__basics">
+      <div className="char__basics faded">
         <img src={thumbnail} alt={name} style={imgStyle} />
         <div>
           <div className="char__info-name">{name}</div>
