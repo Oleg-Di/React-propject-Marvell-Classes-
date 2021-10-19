@@ -5,6 +5,7 @@ import ErrorBoundary from "../errorBoundary/Error.Boundary";
 
 import decoration from "../../resources/img/vision.png";
 import { useState } from "react";
+import CharForm from "../charForm/CharForm";
 
 const MainPage = () => {
     const [selectedChar, setChar] = useState(null);
@@ -23,10 +24,15 @@ const MainPage = () => {
         <ErrorBoundary>
           <CharList onCharSelected={onCharSelected} />
         </ErrorBoundary>
-
+        <div>
         <ErrorBoundary>
           <CharInfo charId={selectedChar} />
         </ErrorBoundary>
+        <ErrorBoundary>
+          <CharForm/>
+        </ErrorBoundary>
+        </div>
+        
       </div>
       <img className="bg-decoration" src={decoration} alt="vision" />
     </>

@@ -1,5 +1,4 @@
 import "./singleComic.scss";
-import xMen from "../../resources/img/x-men.png";
 import { useState } from "react";
 import useMarvelService from "./../../services/MarvelService";
 import { useEffect } from "react/cjs/react.development";
@@ -24,7 +23,6 @@ const SingleComic = ({ comicsId }) => {
   };
   const onComicsLoading = (comics) => {
     setComics(comics);
-    console.log(comics);
   };
   const skeleton = comics || loading || error ? null : <Skeleton />;
   const errorMessage = error ? <ErrorMessage /> : null;

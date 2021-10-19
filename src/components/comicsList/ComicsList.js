@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react/cjs/react.development";
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import { Link } from "react-router-dom";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 const ComicsList = (props) => {
   const [state, setState] = useState({
@@ -14,7 +15,7 @@ const ComicsList = (props) => {
     comicsEnded: false,
   });
 
-  const { error, loading, getAllComics} = useMarvelService();
+  const { error, loading, getAllComics } = useMarvelService();
 
   useEffect(() => {
     onRequest(state.offset, true);
@@ -56,17 +57,20 @@ const ComicsList = (props) => {
   return (
     <div className="comics__list">
       <ul className="comics__grid">
-      {loading && !state.newItemLoading ? (
+        {loading && !state.newItemLoading ? (
           <Spinner />
         ) : error ? (
           <ErrorMessage />
-        ) :
-        <ComicsListView
-          onComicsSelected={props.onComicsSelected}
-          comics={state.comicsList}
-          itemRefs={itemRefs}
-          focusOnItem={focusOnItem}
-        />}
+        ) : (
+          <TransitionGroup component={null}>
+            <ComicsListView
+              onComicsSelected={props.onComicsSelected}
+              comics={state.comicsList}
+              itemRefs={itemRefs}
+              focusOnItem={focusOnItem}
+            />
+          </TransitionGroup>
+        )}
       </ul>
       <button onClick={onRequest} className="button button__main button__long">
         <div className="inner">load more</div>
@@ -86,38 +90,39 @@ const ComicsListView = (props) => {
       imgStyle = { objectFit: "contain" };
     }
     return (
-      <li
-        className="comics__item"
-        ref={(el) => (props.itemRefs.current[i] = el)}
-        tabIndex={0}
-        onClick={() => {
-          props.onComicsSelected(comics.id);
-          props.focusOnItem(i);
-        }}
-        onKeyPress={(e) => {
-          if (e.key === " " || e.key === "Enter") {
-            props.onCharSelected(comics.id);
+      <CSSTransition key={i} timeout={800} classNames="comics__item" in={true}>
+        <li
+          className="comics__item"
+          ref={(el) => (props.itemRefs.current[i] = el)}
+          tabIndex={0}
+          onClick={() => {
+            props.onComicsSelected(comics.id);
             props.focusOnItem(i);
-          }
-        }}
-        key={i}
-        className="char__item"
-      >
-        <Link to={`/comics/${comics.id}`}>
-          <img
-            style={imgStyle}
-            src={thumbnail}
-            alt="ultimate war"
-            className="comics__item-img"
-          />
-          <div style={{ color: "white" }} className="comics__item-name">
-            {title}
-          </div>
-          <div style={{ color: "white" }} className="comics__item-price">
-            Price: {price}$
-          </div>
-        </Link>
-      </li>
+          }}
+          onKeyPress={(e) => {
+            if (e.key === " " || e.key === "Enter") {
+              props.onCharSelected(comics.id);
+              props.focusOnItem(i);
+            }
+          }}
+          className="char__item"
+        >
+          <Link to={`/comics/${comics.id}`}>
+            <img
+              style={imgStyle}
+              src={thumbnail}
+              alt="ultimate war"
+              className="comics__item-img"
+            />
+            <div style={{ color: "white" }} className="comics__item-name">
+              {title}
+            </div>
+            <div style={{ color: "white" }} className="comics__item-price">
+              Price: {price}$
+            </div>
+          </Link>
+        </li>
+      </CSSTransition>
     );
   });
   return <>{list}</>;
